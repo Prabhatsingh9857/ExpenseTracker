@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 const Login = ({
   onLogin,
-  API_URL = "http://localhost:4000",
+  API_URL = "http://https://expense-tracker-backend-9t99.onrender.com",
 }) => {
   const navigate = useNavigate();
 

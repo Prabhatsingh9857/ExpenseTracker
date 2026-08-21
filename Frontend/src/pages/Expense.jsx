@@ -52,7 +52,7 @@ import { expensePageStyles as styles } from "../assets/dummyStyle";
 // API
 // ======================================================
 
-const API_BASE = "http://localhost:4000/api";
+const API_BASE = "http://https://expense-tracker-backend-9t99.onrender.com/api";
 
 
 // ======================================================

@@ -15,7 +15,7 @@ import Sidebar from "../components/sidebar";
 // BACKEND API
 // ======================================================
 
-const API_BASE = "http://localhost:4000/api";
+const API_BASE = "http://https://expense-tracker-backend-9t99.onrender.com/api";
 
 // ======================================================
 // FILTER TRANSACTIONS

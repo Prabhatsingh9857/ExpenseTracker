@@ -206,7 +206,7 @@ const App = () => {
         element={
           <Login
             onLogin={handleLogin}
-            API_URL="http://localhost:4000"
+            API_URL="http://https://expense-tracker-backend-9t99.onrender.com"
           />
         }
       />
@@ -217,7 +217,7 @@ const App = () => {
         path="/signup"
         element={
           <Signup
-            API_URL="http://localhost:4000"
+            API_URL="http://https://expense-tracker-backend-9t99.onrender.com"
           />
         }
       />
