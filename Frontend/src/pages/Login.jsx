@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 const Login = ({
   onLogin,
-  API_URL = "http://https://expense-tracker-backend-9t99.onrender.com",
+  API_URL = "https://expense-tracker-backend-9t99.onrender.com",
 }) => {
   const navigate = useNavigate();
 
@@ -11,11 +11,15 @@ const Login = ({
   const [password, setPassword] = useState("");
 
   // Show / Hide password
-  const [showPassword, setShowPassword] =
-    useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
+  // Remember me
   const [remember, setRemember] = useState(false);
+
+  // Loading
   const [loading, setLoading] = useState(false);
+
+  // Error
   const [error, setError] = useState("");
 
   // ======================================================
@@ -45,14 +49,25 @@ const Login = ({
         }
       );
 
-      const data = await response.json();
+      // Safely read response
+      let data = {};
+
+      try {
+        data = await response.json();
+      } catch {
+        data = {};
+      }
 
       console.log("LOGIN RESPONSE:", data);
+
+      // ==================================================
+      // SERVER ERROR
+      // ==================================================
 
       if (!response.ok) {
         throw new Error(
           data.message ||
-            "Invalid email or password."
+            `Login failed (${response.status}).`
         );
       }
 
@@ -84,7 +99,7 @@ const Login = ({
 
       if (!token) {
         throw new Error(
-          "Login successful, but no token was returned by the server."
+          "Login successful, but no authentication token was returned by the server."
         );
       }
 
@@ -98,6 +113,25 @@ const Login = ({
           remember,
           token
         );
+      } else {
+        // Fallback in case onLogin is not provided
+        const storage = remember
+          ? localStorage
+          : sessionStorage;
+
+        storage.setItem(
+          "token",
+          token
+        );
+
+        if (user) {
+          storage.setItem(
+            "user",
+            JSON.stringify(user)
+          );
+        }
+
+        navigate("/");
       }
 
     } catch (err) {
@@ -106,10 +140,20 @@ const Login = ({
         err
       );
 
-      setError(
-        err.message ||
-          "Unable to login."
-      );
+      // Network / server connection error
+      if (
+        err instanceof TypeError &&
+        err.message.toLowerCase().includes("fetch")
+      ) {
+        setError(
+          "Cannot connect to the server. Please check your internet connection and try again."
+        );
+      } else {
+        setError(
+          err.message ||
+            "Unable to login. Please try again."
+        );
+      }
 
     } finally {
       setLoading(false);
@@ -190,6 +234,7 @@ const Login = ({
               }
               style={styles.input}
               required
+              autoComplete="email"
             />
 
           </div>
@@ -219,6 +264,7 @@ const Login = ({
                 }
                 style={styles.passwordInput}
                 required
+                autoComplete="current-password"
               />
 
               <button
@@ -285,6 +331,10 @@ const Login = ({
               ...styles.button,
               opacity:
                 loading ? 0.7 : 1,
+              cursor:
+                loading
+                  ? "not-allowed"
+                  : "pointer",
             }}
           >
             {loading
@@ -334,6 +384,7 @@ const styles = {
       "linear-gradient(135deg, #d9f5f2, #f4fbfa)",
 
     padding: "20px",
+
     boxSizing: "border-box",
   },
 
@@ -368,7 +419,9 @@ const styles = {
       "rgba(255,255,255,0.18)",
 
     display: "flex",
+
     alignItems: "center",
+
     justifyContent: "center",
   },
 
@@ -408,6 +461,8 @@ const styles = {
     marginBottom: "18px",
 
     fontSize: "14px",
+
+    lineHeight: "1.5",
   },
 
   field: {
@@ -454,6 +509,7 @@ const styles = {
 
   passwordWrapper: {
     position: "relative",
+
     width: "100%",
   },
 
@@ -520,6 +576,8 @@ const styles = {
     fontSize: "13px",
 
     color: "#ffffff",
+
+    gap: "10px",
   },
 
   rememberLabel: {
@@ -528,6 +586,8 @@ const styles = {
     alignItems: "center",
 
     cursor: "pointer",
+
+    whiteSpace: "nowrap",
   },
 
   forgot: {

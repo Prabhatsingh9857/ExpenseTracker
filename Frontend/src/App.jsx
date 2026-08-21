@@ -16,6 +16,13 @@ import Signup from "./pages/Signup";
 import Layout from "./components/Layout";
 
 // ======================================================
+// PRODUCTION BACKEND URL
+// ======================================================
+
+const API_URL =
+  "https://expense-tracker-backend-9t99.onrender.com";
+
+// ======================================================
 // PROTECTED ROUTE
 // ======================================================
 
@@ -42,9 +49,15 @@ const App = () => {
         localStorage.getItem("user") ||
         sessionStorage.getItem("user");
 
-      return savedUser ? JSON.parse(savedUser) : null;
+      return savedUser
+        ? JSON.parse(savedUser)
+        : null;
     } catch (error) {
-      console.error("User loading error:", error);
+      console.error(
+        "User loading error:",
+        error
+      );
+
       return null;
     }
   });
@@ -77,11 +90,16 @@ const App = () => {
     remember = false
   ) => {
     try {
+      // Clear previous authentication
       localStorage.removeItem("user");
       localStorage.removeItem("token");
 
       sessionStorage.removeItem("user");
       sessionStorage.removeItem("token");
+
+      // ==================================================
+      // REMEMBER ME
+      // ==================================================
 
       if (remember) {
         if (userObj) {
@@ -97,7 +115,13 @@ const App = () => {
             tokenStr
           );
         }
-      } else {
+      }
+
+      // ==================================================
+      // SESSION ONLY
+      // ==================================================
+
+      else {
         if (userObj) {
           sessionStorage.setItem(
             "user",
@@ -113,8 +137,10 @@ const App = () => {
         }
       }
 
+      // Update React state
       setUser(userObj || null);
       setToken(tokenStr || null);
+
     } catch (error) {
       console.error(
         "persistAuth error:",
@@ -132,6 +158,14 @@ const App = () => {
     remember,
     tokenFromApi
   ) => {
+    if (!tokenFromApi) {
+      console.error(
+        "Login failed: token missing"
+      );
+
+      return;
+    }
+
     persistAuth(
       userData,
       tokenFromApi,
@@ -154,17 +188,23 @@ const App = () => {
       const userData =
         JSON.stringify(updatedUser);
 
-      if (localStorage.getItem("token")) {
+      // Determine where the token is stored
+      if (
+        localStorage.getItem("token")
+      ) {
         localStorage.setItem(
           "user",
           userData
         );
-      } else {
+      } else if (
+        sessionStorage.getItem("token")
+      ) {
         sessionStorage.setItem(
           "user",
           userData
         );
       }
+
     } catch (error) {
       console.error(
         "Update user error:",
@@ -178,15 +218,19 @@ const App = () => {
   // ====================================================
 
   const handleLogout = () => {
+    // Clear localStorage
     localStorage.removeItem("user");
     localStorage.removeItem("token");
 
+    // Clear sessionStorage
     sessionStorage.removeItem("user");
     sessionStorage.removeItem("token");
 
+    // Clear React state
     setUser(null);
     setToken(null);
 
+    // Go to login
     navigate("/login", {
       replace: true,
     });
@@ -199,30 +243,36 @@ const App = () => {
   return (
     <Routes>
 
-      {/* ================= LOGIN ================= */}
+      {/* ==================================================
+          LOGIN
+      ================================================== */}
 
       <Route
         path="/login"
         element={
           <Login
             onLogin={handleLogin}
-            API_URL="http://https://expense-tracker-backend-9t99.onrender.com"
+            API_URL={API_URL}
           />
         }
       />
 
-      {/* ================= SIGNUP ================= */}
+      {/* ==================================================
+          SIGNUP
+      ================================================== */}
 
       <Route
         path="/signup"
         element={
           <Signup
-            API_URL="http://https://expense-tracker-backend-9t99.onrender.com"
+            API_URL={API_URL}
           />
         }
       />
 
-      {/* ================= PROTECTED ROUTES ================= */}
+      {/* ==================================================
+          PROTECTED ROUTES
+      ================================================== */}
 
       <Route
         element={
@@ -233,7 +283,9 @@ const App = () => {
         }
       >
 
-        {/* ================= LAYOUT ================= */}
+        {/* ==================================================
+            LAYOUT
+        ================================================== */}
 
         <Route
           element={
@@ -241,45 +293,66 @@ const App = () => {
               user={user}
               token={token}
               onLogout={handleLogout}
+              API_URL={API_URL}
             />
           }
         >
 
-          {/* ================= DASHBOARD ================= */}
+          {/* ==================================================
+              DASHBOARD
+          ================================================== */}
 
           <Route
             path="/"
-            element={<Dashboard />}
+            element={
+              <Dashboard />
+            }
           />
 
           <Route
             path="/dashboard"
-            element={<Dashboard />}
+            element={
+              <Dashboard />
+            }
           />
 
-          {/* ================= INCOME ================= */}
+          {/* ==================================================
+              INCOME
+          ================================================== */}
 
           <Route
             path="/income"
-            element={<Income />}
+            element={
+              <Income />
+            }
           />
 
-          {/* ================= EXPENSE ================= */}
+          {/* ==================================================
+              EXPENSE
+          ================================================== */}
 
           <Route
             path="/expense"
-            element={<Expense />}
+            element={
+              <Expense />
+            }
           />
 
-          {/* ================= PROFILE ================= */}
+          {/* ==================================================
+              PROFILE
+          ================================================== */}
 
           <Route
             path="/profile"
             element={
               <Profile
                 user={user}
-                onUpdateProfile={updateUserData}
-                onLogout={handleLogout}
+                onUpdateProfile={
+                  updateUserData
+                }
+                onLogout={
+                  handleLogout
+                }
               />
             }
           />
@@ -287,7 +360,9 @@ const App = () => {
         </Route>
       </Route>
 
-      {/* ================= FALLBACK ================= */}
+      {/* ==================================================
+          FALLBACK
+      ================================================== */}
 
       <Route
         path="*"
