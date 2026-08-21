@@ -15,7 +15,8 @@ import Sidebar from "../components/sidebar";
 // BACKEND API
 // ======================================================
 
-const API_BASE = "http://https://expense-tracker-backend-9t99.onrender.com/api";
+const API_BASE =
+  "https://expense-tracker-backend-9t99.onrender.com/api";
 
 // ======================================================
 // FILTER TRANSACTIONS
@@ -196,7 +197,10 @@ const Layout = ({ user: appUser, onLogout }) => {
       const token = getAuthToken();
 
       if (!token) {
-        console.warn("No authentication token found.");
+        console.warn(
+          "No authentication token found."
+        );
+
         setTransactions([]);
         return;
       }
@@ -206,38 +210,48 @@ const Layout = ({ user: appUser, onLogout }) => {
         "Content-Type": "application/json",
       };
 
-      const [incomeResponse, expenseResponse] =
-        await Promise.all([
-          axios.get(`${API_BASE}/income/get`, {
+      const [
+        incomeResponse,
+        expenseResponse,
+      ] = await Promise.all([
+        axios.get(
+          `${API_BASE}/income/get`,
+          {
             headers,
-          }),
+          }
+        ),
 
-          axios.get(`${API_BASE}/expense/get`, {
+        axios.get(
+          `${API_BASE}/expense/get`,
+          {
             headers,
-          }),
-        ]);
+          }
+        ),
+      ]);
 
       // =================================================
       // INCOME
       // =================================================
 
-      const incomes = safeArrayFromResponse(
-        incomeResponse
-      ).map((income) => ({
-        ...income,
-        type: "income",
-      }));
+      const incomes =
+        safeArrayFromResponse(
+          incomeResponse
+        ).map((income) => ({
+          ...income,
+          type: "income",
+        }));
 
       // =================================================
       // EXPENSE
       // =================================================
 
-      const expenses = safeArrayFromResponse(
-        expenseResponse
-      ).map((expense) => ({
-        ...expense,
-        type: "expense",
-      }));
+      const expenses =
+        safeArrayFromResponse(
+          expenseResponse
+        ).map((expense) => ({
+          ...expense,
+          type: "expense",
+        }));
 
       // =================================================
       // COMBINE
@@ -252,7 +266,9 @@ const Layout = ({ user: appUser, onLogout }) => {
             transaction._id ||
             transaction.id ||
             transaction.id_str ||
-            Math.random().toString(36).slice(2),
+            Math.random()
+              .toString(36)
+              .slice(2),
 
           description:
             transaction.description ||
@@ -261,10 +277,12 @@ const Layout = ({ user: appUser, onLogout }) => {
             "Transaction",
 
           amount:
-            transaction.amount !== undefined &&
+            transaction.amount !==
+              undefined &&
             transaction.amount !== null
               ? Number(transaction.amount)
-              : Number(transaction.value) || 0,
+              : Number(transaction.value) ||
+                0,
 
           date:
             transaction.date ||
@@ -272,7 +290,8 @@ const Layout = ({ user: appUser, onLogout }) => {
             new Date().toISOString(),
 
           category:
-            transaction.category || "Other",
+            transaction.category ||
+            "Other",
 
           type: transaction.type,
 
@@ -284,7 +303,10 @@ const Layout = ({ user: appUser, onLogout }) => {
             new Date(a.date).getTime()
         );
 
-      setTransactions(allTransactions);
+      setTransactions(
+        allTransactions
+      );
+
       setLastUpdated(new Date());
 
       console.log(
@@ -307,7 +329,9 @@ const Layout = ({ user: appUser, onLogout }) => {
         error?.response?.data
       );
 
-      if (error?.response?.status === 401) {
+      if (
+        error?.response?.status === 401
+      ) {
         console.warn(
           "Authentication expired. Please login again."
         );
@@ -329,7 +353,9 @@ const Layout = ({ user: appUser, onLogout }) => {
   // ADD TRANSACTION
   // ====================================================
 
-  const addTransaction = async (transaction) => {
+  const addTransaction = async (
+    transaction
+  ) => {
     try {
       const token = getAuthToken();
 
@@ -340,8 +366,10 @@ const Layout = ({ user: appUser, onLogout }) => {
       }
 
       if (
-        transaction.type !== "income" &&
-        transaction.type !== "expense"
+        transaction.type !==
+          "income" &&
+        transaction.type !==
+          "expense"
       ) {
         throw new Error(
           "Transaction type must be income or expense."
@@ -349,18 +377,23 @@ const Layout = ({ user: appUser, onLogout }) => {
       }
 
       const endpoint =
-        transaction.type === "income"
+        transaction.type ===
+        "income"
           ? "income/add"
           : "expense/add";
 
       const payload = {
         description:
-          transaction.description?.trim() || "",
+          transaction.description?.trim() ||
+          "",
 
-        amount: Number(transaction.amount),
+        amount: Number(
+          transaction.amount
+        ),
 
         category:
-          transaction.category || "Other",
+          transaction.category ||
+          "Other",
 
         date: transaction.date,
       };
@@ -372,7 +405,9 @@ const Layout = ({ user: appUser, onLogout }) => {
       }
 
       if (
-        !Number.isFinite(payload.amount) ||
+        !Number.isFinite(
+          payload.amount
+        ) ||
         payload.amount <= 0
       ) {
         throw new Error(
@@ -381,7 +416,9 @@ const Layout = ({ user: appUser, onLogout }) => {
       }
 
       if (!payload.date) {
-        throw new Error("Date is required.");
+        throw new Error(
+          "Date is required."
+        );
       }
 
       await axios.post(
@@ -390,7 +427,8 @@ const Layout = ({ user: appUser, onLogout }) => {
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
+            "Content-Type":
+              "application/json",
           },
         }
       );
@@ -428,18 +466,23 @@ const Layout = ({ user: appUser, onLogout }) => {
       }
 
       const endpoint =
-        transaction.type === "income"
+        transaction.type ===
+        "income"
           ? "income/update"
           : "expense/update";
 
       const payload = {
         description:
-          transaction.description?.trim() || "",
+          transaction.description?.trim() ||
+          "",
 
-        amount: Number(transaction.amount),
+        amount: Number(
+          transaction.amount
+        ),
 
         category:
-          transaction.category || "Other",
+          transaction.category ||
+          "Other",
 
         date: transaction.date,
       };
@@ -450,7 +493,8 @@ const Layout = ({ user: appUser, onLogout }) => {
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
+            "Content-Type":
+              "application/json",
           },
         }
       );
@@ -520,12 +564,16 @@ const Layout = ({ user: appUser, onLogout }) => {
   // FILTERED TRANSACTIONS
   // ====================================================
 
-  const filteredTransactions = useMemo(() => {
-    return filterTransactions(
+  const filteredTransactions =
+    useMemo(() => {
+      return filterTransactions(
+        transactions,
+        timeFrame
+      );
+    }, [
       transactions,
-      timeFrame
-    );
-  }, [transactions, timeFrame]);
+      timeFrame,
+    ]);
 
   // ====================================================
   // STATISTICS
@@ -534,35 +582,52 @@ const Layout = ({ user: appUser, onLogout }) => {
   const stats = useMemo(() => {
     const now = new Date();
 
-    const thirtyDaysAgo = new Date(now);
+    const thirtyDaysAgo =
+      new Date(now);
 
     thirtyDaysAgo.setDate(
       now.getDate() - 30
     );
 
-    const sixtyDaysAgo = new Date(now);
+    const sixtyDaysAgo =
+      new Date(now);
 
     sixtyDaysAgo.setDate(
       now.getDate() - 60
     );
 
-    // Last 30 days
-    const last30DaysTransactions =
-      transactions.filter((transaction) => {
-        const date = new Date(transaction.date);
+    // ==================================================
+    // LAST 30 DAYS
+    // ==================================================
 
-        return date >= thirtyDaysAgo;
-      });
+    const last30DaysTransactions =
+      transactions.filter(
+        (transaction) => {
+          const date =
+            new Date(
+              transaction.date
+            );
+
+          return (
+            date >= thirtyDaysAgo
+          );
+        }
+      );
 
     const last30DaysIncome =
       last30DaysTransactions
         .filter(
           (transaction) =>
-            transaction.type === "income"
+            transaction.type ===
+            "income"
         )
         .reduce(
           (sum, transaction) =>
-            sum + Number(transaction.amount || 0),
+            sum +
+            Number(
+              transaction.amount ||
+                0
+            ),
           0
         );
 
@@ -570,24 +635,37 @@ const Layout = ({ user: appUser, onLogout }) => {
       last30DaysTransactions
         .filter(
           (transaction) =>
-            transaction.type === "expense"
+            transaction.type ===
+            "expense"
         )
         .reduce(
           (sum, transaction) =>
-            sum + Number(transaction.amount || 0),
+            sum +
+            Number(
+              transaction.amount ||
+                0
+            ),
           0
         );
 
-    // All time
+    // ==================================================
+    // ALL TIME
+    // ==================================================
+
     const allTimeIncome =
       transactions
         .filter(
           (transaction) =>
-            transaction.type === "income"
+            transaction.type ===
+            "income"
         )
         .reduce(
           (sum, transaction) =>
-            sum + Number(transaction.amount || 0),
+            sum +
+            Number(
+              transaction.amount ||
+                0
+            ),
           0
         );
 
@@ -595,11 +673,16 @@ const Layout = ({ user: appUser, onLogout }) => {
       transactions
         .filter(
           (transaction) =>
-            transaction.type === "expense"
+            transaction.type ===
+            "expense"
         )
         .reduce(
           (sum, transaction) =>
-            sum + Number(transaction.amount || 0),
+            sum +
+            Number(
+              transaction.amount ||
+                0
+            ),
           0
         );
 
@@ -620,26 +703,39 @@ const Layout = ({ user: appUser, onLogout }) => {
           )
         : 0;
 
-    // Previous 30 days
-    const previous30DaysTransactions =
-      transactions.filter((transaction) => {
-        const date = new Date(transaction.date);
+    // ==================================================
+    // PREVIOUS 30 DAYS
+    // ==================================================
 
-        return (
-          date >= sixtyDaysAgo &&
-          date < thirtyDaysAgo
-        );
-      });
+    const previous30DaysTransactions =
+      transactions.filter(
+        (transaction) => {
+          const date =
+            new Date(
+              transaction.date
+            );
+
+          return (
+            date >= sixtyDaysAgo &&
+            date < thirtyDaysAgo
+          );
+        }
+      );
 
     const previous30DaysExpenses =
       previous30DaysTransactions
         .filter(
           (transaction) =>
-            transaction.type === "expense"
+            transaction.type ===
+            "expense"
         )
         .reduce(
           (sum, transaction) =>
-            sum + Number(transaction.amount || 0),
+            sum +
+            Number(
+              transaction.amount ||
+                0
+            ),
           0
         );
 
@@ -682,27 +778,30 @@ const Layout = ({ user: appUser, onLogout }) => {
   // TIME FRAME LABEL
   // ====================================================
 
-  const timeFrameLabel = useMemo(() => {
-    if (timeFrame === "daily") {
-      return "Today";
-    }
+  const timeFrameLabel =
+    useMemo(() => {
+      if (timeFrame === "daily") {
+        return "Today";
+      }
 
-    if (timeFrame === "weekly") {
-      return "This Week";
-    }
+      if (timeFrame === "weekly") {
+        return "This Week";
+      }
 
-    if (timeFrame === "yearly") {
-      return "This Year";
-    }
+      if (timeFrame === "yearly") {
+        return "This Year";
+      }
 
-    return "This Month";
-  }, [timeFrame]);
+      return "This Month";
+    }, [timeFrame]);
 
   // ====================================================
   // SAVINGS RATING
   // ====================================================
 
-  const getSavingsRating = (rate) => {
+  const getSavingsRating = (
+    rate
+  ) => {
     if (rate > 30) {
       return "Excellent";
     }
@@ -718,31 +817,46 @@ const Layout = ({ user: appUser, onLogout }) => {
   // TOP CATEGORIES
   // ====================================================
 
-  const topCategories = useMemo(() => {
-    const categoryTotals =
-      transactions
-        .filter(
-          (transaction) =>
-            transaction.type === "expense"
+  const topCategories =
+    useMemo(() => {
+      const categoryTotals =
+        transactions
+          .filter(
+            (transaction) =>
+              transaction.type ===
+              "expense"
+          )
+          .reduce(
+            (
+              accumulator,
+              transaction
+            ) => {
+              const category =
+                transaction.category ||
+                "Other";
+
+              accumulator[category] =
+                (accumulator[
+                  category
+                ] || 0) +
+                Number(
+                  transaction.amount ||
+                    0
+                );
+
+              return accumulator;
+            },
+            {}
+          );
+
+      return Object.entries(
+        categoryTotals
+      )
+        .sort(
+          (a, b) => b[1] - a[1]
         )
-        .reduce(
-          (accumulator, transaction) => {
-            const category =
-              transaction.category || "Other";
-
-            accumulator[category] =
-              (accumulator[category] || 0) +
-              Number(transaction.amount || 0);
-
-            return accumulator;
-          },
-          {}
-        );
-
-    return Object.entries(categoryTotals)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5);
-  }, [transactions]);
+        .slice(0, 5);
+    }, [transactions]);
 
   // ====================================================
   // DISPLAYED TRANSACTIONS
@@ -758,9 +872,11 @@ const Layout = ({ user: appUser, onLogout }) => {
   // ====================================================
 
   const outletContext = {
-    transactions: filteredTransactions,
+    transactions:
+      filteredTransactions,
 
-    allTransactions: transactions,
+    allTransactions:
+      transactions,
 
     stats,
 
@@ -770,7 +886,8 @@ const Layout = ({ user: appUser, onLogout }) => {
 
     deleteTransaction,
 
-    refreshTransactions: fetchTransactions,
+    refreshTransactions:
+      fetchTransactions,
 
     timeFrame,
 
@@ -807,8 +924,12 @@ const Layout = ({ user: appUser, onLogout }) => {
 
       <Sidebar
         user={user}
-        isCollapsed={sidebarCollapsed}
-        setIsCollapsed={setSidebarCollapsed}
+        isCollapsed={
+          sidebarCollapsed
+        }
+        setIsCollapsed={
+          setSidebarCollapsed
+        }
         onLogout={onLogout}
       />
 
@@ -825,7 +946,9 @@ const Layout = ({ user: appUser, onLogout }) => {
           }
         `}
       >
-        <Outlet context={outletContext} />
+        <Outlet
+          context={outletContext}
+        />
       </main>
 
     </div>
