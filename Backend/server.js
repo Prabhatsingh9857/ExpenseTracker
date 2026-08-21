@@ -1,6 +1,9 @@
 import dns from "dns";
 
-// Google DNS
+// ======================================================
+// DNS
+// ======================================================
+
 dns.setServers([
   "8.8.8.8",
   "8.8.4.4",
@@ -17,13 +20,11 @@ import incomeRouter from "./routes/incomeRoute.js";
 import expenseRouter from "./routes/expenseRoute.js";
 import dashboardRouter from "./routes/dashboardRoute.js";
 
-
 // ======================================================
 // LOAD ENVIRONMENT VARIABLES
 // ======================================================
 
 dotenv.config();
-
 
 // ======================================================
 // CREATE EXPRESS APP
@@ -33,18 +34,56 @@ const app = express();
 
 const PORT = process.env.PORT || 4000;
 
-
 // ======================================================
 // CORS
 // ======================================================
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+  "https://expensetracker-41xa.onrender.com",
+  process.env.FRONTEND_URL,
+].filter(Boolean);
+
+console.log("Allowed CORS origins:", allowedOrigins);
+
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: (origin, callback) => {
+      // Allow requests without an Origin
+      // (Postman, server-to-server requests, etc.)
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      console.log("❌ CORS blocked origin:", origin);
+
+      return callback(
+        new Error(`CORS blocked origin: ${origin}`)
+      );
+    },
+
     credentials: true,
+
+    methods: [
+      "GET",
+      "POST",
+      "PUT",
+      "PATCH",
+      "DELETE",
+      "OPTIONS",
+    ],
+
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+    ],
   })
 );
-
 
 // ======================================================
 // BODY PARSER
@@ -58,7 +97,6 @@ app.use(
   })
 );
 
-
 // ======================================================
 // BASIC TEST ROUTE
 // ======================================================
@@ -69,7 +107,6 @@ app.get("/", (req, res) => {
     message: "Expense Tracker API is working",
   });
 });
-
 
 // ======================================================
 // API ROUTES
@@ -99,7 +136,6 @@ app.use(
   dashboardRouter
 );
 
-
 // ======================================================
 // 404 ROUTE
 // ======================================================
@@ -111,7 +147,6 @@ app.use((req, res) => {
     path: req.originalUrl,
   });
 });
-
 
 // ======================================================
 // GLOBAL ERROR HANDLER
@@ -127,26 +162,23 @@ app.use((err, req, res, next) => {
   });
 });
 
-
 // ======================================================
 // START SERVER
 // ======================================================
 
 const startServer = async () => {
   try {
-
     // Connect MongoDB
     await connectDB();
 
     // Start Express
-    app.listen(PORT, () => {
+    app.listen(PORT, "0.0.0.0", () => {
       console.log(
-        `🚀 Server running on http://localhost:${PORT}`
+        `🚀 Server running on port ${PORT}`
       );
     });
 
   } catch (error) {
-
     console.error(
       "❌ Failed to start server:",
       error.message
@@ -155,7 +187,6 @@ const startServer = async () => {
     process.exit(1);
   }
 };
-
 
 // ======================================================
 // RUN SERVER
